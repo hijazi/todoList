@@ -36,19 +36,6 @@ if (Meteor.isClient) {
 
   Template.body.helpers({
 
-    tasks: function () {
-
-      if (Session.get("hideCompleted")) {
-        // if hide-completed is checked then filter tasks
-        return Tasks.find({checked: {$ne: true}}, {sort: {createdAt: -1}});
-      } else {
-        //otherwise, return all tasks
-        // sort and siparate first 
-        return Tasks.find({}, {sort: {createdAt: -1}});
-      }
-
-    },
-
     hideCompleted: function () {
       var hideCompleted = Session.get("hideCompleted");
 
@@ -102,6 +89,27 @@ if (Meteor.isClient) {
 
     }
 
+  });
+
+  Template.tasksShow.helpers({
+    show: function() {
+      return "tasksLayout";
+    }
+  });
+
+  Template.getTasks.helpers({
+
+    tasks: function () {
+
+      if (Session.get("hideCompleted")) {
+        // if hide-completed is checked then filter tasks
+        return Tasks.find({checked: {$ne: true}}, {sort: {createdAt: -1}});
+      } else {
+        //otherwise, return all tasks
+        return Tasks.find({}, {sort: {createdAt: -1}});
+      }
+
+    }
   });
 
   Template.task.helpers({
@@ -176,11 +184,11 @@ Meteor.methods({
 
     },
 
-        deleteTask: function (taskId) {
+    deleteTask: function (taskId) {
 
-    var task = Tasks.findOne(taskId);
+      var task = Tasks.findOne(taskId);
 
-    if (task.private && task.owner !== Meteor.userId()) {
+      if (task.private && task.owner !== Meteor.userId()) {
 
       // If the task is private, make sure only the owner can delete it
 
@@ -188,7 +196,7 @@ Meteor.methods({
 
     }
 
- 
+
 
     Tasks.remove(taskId);
 
@@ -206,15 +214,15 @@ Meteor.methods({
 
     }
 
- 
+
 
     Tasks.update(taskId, { $set: { checked: setChecked} });
 
   },
 
-    setPrivate: function (taskId, setToPrivate) {
+  setPrivate: function (taskId, setToPrivate) {
 
-      var task = Tasks.findOne(taskId);
+    var task = Tasks.findOne(taskId);
 
     // Make sure only the task owner can make a task private
 
@@ -228,4 +236,11 @@ Meteor.methods({
 
   }
 
+});
+
+FlowRouter.route('/lists', {
+  name: 'Lists.show',
+  action(params, queryParams) {
+    alarm("Looking at a list?");
+  }
 });
